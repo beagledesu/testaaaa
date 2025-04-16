@@ -35,4 +35,4 @@ private:
 
     // クライアント接続時の処理
     void onClientConnected(std::shared_ptr<ix::WebSocket> webSocket);
-};
+};#pragma once

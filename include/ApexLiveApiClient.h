@@ -28,4 +28,4 @@ private:
     std::unique_ptr<ix::WebSocket> webSocket_;
     MessageCallback messageCallback_;
     bool connected_;
-};
+};#pragma once

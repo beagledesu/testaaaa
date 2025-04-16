@@ -2,8 +2,8 @@
 #include <iostream>
 
 WebSocketServer::WebSocketServer() : running_(false) {
-    // ã‚µãƒ¼ãƒãƒ¼ã®åˆæœŸåŒ–
-    server_ = std::make_unique<ix::WebSocketServer>(ix::SocketTLSOptions{}, nullptr, ix::WebSocketPerMessageDeflateOptions(true));
+    // ƒT[ƒo[‚Ì‰Šú‰»
+    server_ = std::make_unique<ix::WebSocketServer>();
 }
 
 WebSocketServer::~WebSocketServer() {
@@ -15,25 +15,38 @@ bool WebSocketServer::run(uint16_t port) {
         return false;
     }
 
-    // ãƒãƒ¼ãƒˆè¨­å®š
-    server_->setPort(port);
+    // ƒ|[ƒgİ’è
+    server_->configure(port);  // ’¼ÚƒRƒ“ƒXƒgƒ‰ƒNƒ^‚Åİ’è‚³‚ê‚Ä‚¢‚é‚½‚ßAİ’èƒƒ\ƒbƒh‚Í•K—v‚È‚¢
 
-    // æ¥ç¶šãƒãƒ³ãƒ‰ãƒ©ã®è¨­å®š
-    server_->setOnConnectionCallback(
-        [this](std::shared_ptr<ix::WebSocket> webSocket,
-               std::shared_ptr<ix::ConnectionState> connectionState) {
-            onClientConnected(webSocket);
+    // ƒNƒ‰ƒCƒAƒ“ƒgƒƒbƒZ[ƒWƒR[ƒ‹ƒoƒbƒN‚Ìİ’è
+    server_->setOnClientMessageCallback(
+        [this](std::shared_ptr<ix::ConnectionState> connectionState,
+            ix::WebSocket& webSocket,
+            const ix::WebSocketMessagePtr& msg) {
+                // ƒƒbƒZ[ƒWƒ^ƒCƒv‚É‰‚¶‚½ˆ—
+                if (msg->type == ix::WebSocketMessageType::Open) {
+                    // ƒNƒ‰ƒCƒAƒ“ƒgÚ‘±
+                    auto webSocketPtr = std::shared_ptr<ix::WebSocket>(&webSocket, [](ix::WebSocket*) {});
+                    onClientConnected(webSocketPtr);
+                }
+                else if (msg->type == ix::WebSocketMessageType::Message) {
+                    // ƒeƒLƒXƒgƒƒbƒZ[ƒW‚ğóM‚µ‚½ê‡
+                    if (messageCallback_) {
+                        messageCallback_(msg->str);
+                    }
+                }
+                else if (msg->type == ix::WebSocketMessageType::Close) {
+                    // Ú‘±‚ª•Â‚¶‚ç‚ê‚½ê‡
+                    auto webSocketPtr = std::shared_ptr<ix::WebSocket>(&webSocket, [](ix::WebSocket*) {});
+                    std::lock_guard<std::mutex> lock(clientsMutex_);
+                    clients_.erase(webSocketPtr);
+                    std::cout << "Client disconnected. Total connections: " << clients_.size() << std::endl;
+                }
         });
 
-    // ã‚µãƒ¼ãƒãƒ¼èµ·å‹•
-    if (!server_->listen().success) {
-        std::cerr << "Failed to listen on port " << port << std::endl;
-        return false;
-    }
-
-    // ã‚µãƒ¼ãƒãƒ¼é–‹å§‹
-    if (!server_->start().success) {
-        std::cerr << "Failed to start WebSocket server" << std::endl;
+    // ƒT[ƒo[‹N“®‚ÆƒŠƒbƒXƒ“ (listenAndStartƒƒ\ƒbƒh‚ğg—p)
+    if (!server_->listenAndStart()) {
+        std::cerr << "Failed to start WebSocket server on port " << port << std::endl;
         return false;
     }
 
@@ -47,11 +60,11 @@ void WebSocketServer::stop() {
         return;
     }
 
-    // ã‚µãƒ¼ãƒãƒ¼åœæ­¢
+    // ƒT[ƒo[’â~
     server_->stop();
     running_ = false;
 
-    // ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆåˆ‡æ–­
+    // ƒNƒ‰ƒCƒAƒ“ƒgØ’f
     {
         std::lock_guard<std::mutex> lock(clientsMutex_);
         clients_.clear();
@@ -65,8 +78,10 @@ void WebSocketServer::broadcastMessage(const std::string& message) {
         return;
     }
 
-    std::lock_guard<std::mutex> lock(clientsMutex_);
-    for (auto& client : clients_) {
+    // ƒT[ƒo[‚©‚ç‚·‚×‚Ä‚ÌƒNƒ‰ƒCƒAƒ“ƒg‚ğæ“¾
+    auto serverClients = server_->getClients();
+
+    for (auto& client : serverClients) {
         if (client->getReadyState() == ix::ReadyState::Open) {
             client->send(message);
         }
@@ -78,27 +93,11 @@ void WebSocketServer::setMessageCallback(MessageCallback callback) {
 }
 
 void WebSocketServer::onClientConnected(std::shared_ptr<ix::WebSocket> webSocket) {
-    // ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆæ¥ç¶šæ™‚ã®å‡¦ç†
+    // ƒNƒ‰ƒCƒAƒ“ƒgÚ‘±‚Ìˆ—
     {
         std::lock_guard<std::mutex> lock(clientsMutex_);
         clients_.insert(webSocket);
     }
 
     std::cout << "Client connected. Total connections: " << clients_.size() << std::endl;
-
-    // ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å—ä¿¡æ™‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯è¨­å®š
-    webSocket->setOnMessageCallback(
-        [this, webSocket](const ix::WebSocketMessagePtr& msg) {
-            if (msg->type == ix::WebSocketMessageType::Message) {
-                // ãƒ†ã‚­ã‚¹ãƒˆãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å—ä¿¡ã—ãŸå ´åˆ
-                if (messageCallback_) {
-                    messageCallback_(msg->str);
-                }
-            } else if (msg->type == ix::WebSocketMessageType::Close) {
-                // æ¥ç¶šãŒé–‰ã˜ã‚‰ã‚ŒãŸå ´åˆ
-                std::lock_guard<std::mutex> lock(clientsMutex_);
-                clients_.erase(webSocket);
-                std::cout << "Client disconnected. Total connections: " << clients_.size() << std::endl;
-            }
-        });
 }
