@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Overlay Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Apex Overlay Manager</h1>
+        </header>
+        
+        <div class="connection-status">
+            <span id="status-indicator" class="indicator disconnected"></span>
+            <span id="status-text">未接続</span>
+            <button id="connect-button">接続</button>
+        </div>
+        
+        <div class="main-content">
+            <div class="section">
+                <h2>オーバーレイプレビュー</h2>
+                <div class="preview-container">
+                    <iframe id="overlay-preview" src="overlay.html" frameborder="0"></iframe>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>設定</h2>
+                <div class="settings-form">
+                    <div class="form-group">
+                        <label for="server-port">WebSocketサーバーポート</label>
+                        <input type="number" id="server-port" min="1" max="65535" value="8080">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="apex-uri">Apex LiveAPI URI</label>
+                        <input type="text" id="apex-uri" value="ws://127.0.0.1:7777">
+                    </div>
+                    
+                    <button id="save-settings">設定を保存</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>オーバーレイURL</h2>
+                <div class="overlay-urls">
+                    <div class="url-item">
+                        <p>チーム情報オーバーレイ：</p>
+                        <div class="url-box">
+                            <input type="text" readonly id="team-overlay-url" value="http://localhost:8080/web/team-overlay.html">
+                            <button class="copy-button" data-target="team-overlay-url">コピー</button>
+                        </div>
+                    </div>
+                    
+                    <div class="url-item">
+                        <p>プレイヤー情報オーバーレイ：</p>
+                        <div class="url-box">
+                            <input type="text" readonly id="player-overlay-url" value="http://localhost:8080/web/player-overlay.html">
+                            <button class="copy-button" data-target="player-overlay-url">コピー</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/app.js"></script>
+</body>
+</html>

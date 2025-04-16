@@ -1,0 +1,111 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: transparent;
+    overflow: hidden;
+    color: white;
+}
+
+.player-overlay {
+    width: 300px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.player-header {
+    margin-bottom: 10px;
+}
+
+.player-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #DA292E;
+}
+
+.player-team {
+    font-size: 14px;
+    color: #ccc;
+}
+
+.player-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.player-stat {
+    text-align: center;
+    flex-grow: 1;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #DA292E;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #ccc;
+}
+
+.equipment-section {
+    margin-bottom: 10px;
+}
+
+.section-title {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #ccc;
+}
+
+.equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+}
+
+.equipment-item {
+    background: rgba(30, 35, 38, 0.7);
+    border-radius: 3px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.item-icon {
+    width: 20px;
+    height: 20px;
+    background: #555;
+    border-radius: 3px;
+    margin-right: 5px;
+}
+
+.item-name {
+    font-size: 12px;
+    flex-grow: 1;
+}
+
+.inventory-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+}
+
+.inventory-item {
+    background: rgba(30, 35, 38, 0.7);
+    border-radius: 3px;
+    padding: 5px;
+    text-align: center;
+}
+
+.item-count {
+    font-weight: bold;
+    color: #DA292E;
+}

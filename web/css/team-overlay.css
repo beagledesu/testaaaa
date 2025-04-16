@@ -1,0 +1,105 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: transparent;
+    overflow: hidden;
+    color: white;
+}
+
+.team-overlay {
+    width: 300px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.team-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.team-name {
+    font-size: 18px;
+    font-weight: bold;
+    flex-grow: 1;
+}
+
+.team-position {
+    font-weight: bold;
+    color: #DA292E;
+    padding: 3px 8px;
+    background: rgba(30, 35, 38, 0.7);
+    border-radius: 3px;
+}
+
+.team-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.team-stat {
+    text-align: center;
+    flex-grow: 1;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #DA292E;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #ccc;
+}
+
+.player-list {
+    list-style: none;
+}
+
+.player-item {
+    padding: 5px;
+    margin-bottom: 5px;
+    background: rgba(30, 35, 38, 0.7);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+}
+
+.player-name {
+    flex-grow: 1;
+}
+
+.player-status {
+    display: flex;
+    align-items: center;
+}
+
+.player-health {
+    width: 80px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-right: 5px;
+}
+
+.health-bar {
+    height: 100%;
+    background: #DA292E;
+}
+
+.player-kills {
+    font-weight: bold;
+    width: 20px;
+    text-align: center;
+}
